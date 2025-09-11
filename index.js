@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, onAuthStateChanged, signOut, 
   signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, updateDoc, serverTimestamp } 
+import { getFirestore, doc, setDoc, updateDoc, serverTimestamp, collection, addDoc, query, where, orderBy, onSnapshot, deleteDoc } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Firebase Config
@@ -32,6 +32,20 @@ const sidebarLinks = document.getElementById("sidebar-links");
 const sidebar = document.getElementById("sidebar");
 const navToggle = document.getElementById("nav-toggle");
 const closeBtn = document.getElementById("close-btn");
+// My APIs UI refs
+const apisList = document.getElementById('apis-list');
+const apisEmpty = document.getElementById('apis-empty');
+const apiSearch = document.getElementById('api-search');
+const apiAddBtn = document.getElementById('api-add-btn');
+const apiModal = document.getElementById('apiModal');
+const closeApiModal = document.getElementById('closeApiModal');
+const apiForm = document.getElementById('apiForm');
+const apiModalTitle = document.getElementById('apiModalTitle');
+const apiIdInput = document.getElementById('apiId');
+const apiModeInput = document.getElementById('apiMode');
+const apiNameInput = document.getElementById('apiName');
+const apiDescInput = document.getElementById('apiDesc');
+const apiKeyInput = document.getElementById('apiKey');
 
 // Modals
 const loginModal = document.getElementById("loginModal");
@@ -85,6 +99,7 @@ function updateNavbar(user) {
     <li><a href="#">Home</a></li>
     <li><a href="#">About</a></li>
     <li><a href="#">Privacy</a></li>
+    <li><a href="#api-manager">API Manager</a></li>
   `;
 
   if (user) {
@@ -143,8 +158,7 @@ function updateNavbar(user) {
       <li><a href="#">Home</a></li>
       <li><a href="#">About</a></li>
       <li><a href="#">Privacy</a></li>
-      <li><a href="#">Profile</a></li>
-      <li><a href="#" id="logout-mobile">Logout</a></li>
+
     `;
     document.getElementById("logout-mobile").onclick = () => {
       signOut(auth);
@@ -170,8 +184,9 @@ function updateNavbar(user) {
       <li><a href="#">Home</a></li>
       <li><a href="#">About</a></li>
       <li><a href="#">Privacy</a></li>
+      <div class="sidebottom">
       <li><a href="#" id="loginSidebar">Login</a></li>
-      <li><a href="#" id="signupSidebar">Signup</a></li>
+      <li><a href="#" id="signupSidebar">Signup</a></li></
     `;
     document.getElementById("loginSidebar").onclick = () => {
       loginModal.style.display = "flex";
@@ -264,5 +279,132 @@ document.addEventListener('click', (e) => {
   }
   if (target.id === 'cta-sign-in') {
     if (typeof loginModal !== 'undefined') loginModal.style.display = 'flex';
+  }
+});
+
+// ===== My APIs (Firestore CRUD) =====
+let unsubscribeApis = null;
+let currentUserId = null;
+let cachedApis = [];
+
+function renderApis(items){
+  const term = (apiSearch?.value || '').toLowerCase();
+  const filtered = term ? items.filter(it => (it.name||'').toLowerCase().includes(term) || (it.description||'').toLowerCase().includes(term)) : items;
+  if (!apisList) return;
+  apisList.innerHTML = '';
+  if (!filtered.length){
+    if (apisEmpty) apisEmpty.style.display = 'block';
+    return;
+  }
+  if (apisEmpty) apisEmpty.style.display = 'none';
+  for (const it of filtered){
+    const card = document.createElement('div');
+    card.className = 'api-card';
+    card.innerHTML = `
+      <h3>${it.name || 'Untitled'}</h3>
+      <p>${it.description || ''}</p>
+      <div class="api-row">
+        <span class="api-key" title="${it.key}">${it.key}</span>
+      </div>
+      <div class="api-actions">
+        <button class="btn-ghost" data-action="copy" data-id="${it.id}">Copy</button>
+        <button class="btn-ghost" data-action="edit" data-id="${it.id}">Edit</button>
+        <button class="btn-ghost" data-action="delete" data-id="${it.id}">Delete</button>
+      </div>
+    `;
+    apisList.appendChild(card);
+  }
+}
+
+function watchApis(user){
+  if (!apisList) return;
+  if (unsubscribeApis) { unsubscribeApis(); unsubscribeApis = null; }
+  cachedApis = [];
+  if (!user){
+    apisList.innerHTML = '';
+    if (apisEmpty) apisEmpty.style.display = 'block';
+    return;
+  }
+  currentUserId = user.uid;
+  const q = query(collection(db, 'apis'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
+  unsubscribeApis = onSnapshot(q, (snap) => {
+    cachedApis = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderApis(cachedApis);
+  });
+}
+
+// Hook auth changes to APIs list
+onAuthStateChanged(auth, (user) => {
+  watchApis(user);
+});
+
+// Search
+apiSearch?.addEventListener('input', () => renderApis(cachedApis));
+
+// Add button
+apiAddBtn?.addEventListener('click', () => {
+  if (!auth.currentUser){ alert('Please sign in first.'); return; }
+  apiModalTitle.textContent = 'Add API';
+  apiModeInput.value = 'create';
+  apiIdInput.value = '';
+  apiNameInput.value = '';
+  apiDescInput.value = '';
+  apiKeyInput.value = '';
+  apiModal.style.display = 'flex';
+});
+
+// Close modal
+closeApiModal?.addEventListener('click', () => apiModal.style.display = 'none');
+window.addEventListener('click', (e) => { if (e.target === apiModal) apiModal.style.display = 'none'; });
+
+// Save (create/update)
+apiForm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!auth.currentUser){ alert('Please sign in first.'); return; }
+  const payload = {
+    uid: auth.currentUser.uid,
+    name: apiNameInput.value.trim(),
+    description: apiDescInput.value.trim(),
+    key: apiKeyInput.value.trim(),
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+  try {
+    if (apiModeInput.value === 'edit' && apiIdInput.value){
+      await updateDoc(doc(db, 'apis', apiIdInput.value), payload);
+    } else {
+      await addDoc(collection(db, 'apis'), payload);
+    }
+    apiModal.style.display = 'none';
+  } catch (err){
+    alert('Failed to save: ' + err.message);
+  }
+});
+
+// List actions (copy/edit/delete)
+apisList?.addEventListener('click', async (e) => {
+  const target = e.target;
+  if (!(target instanceof HTMLElement)) return;
+  const action = target.getAttribute('data-action');
+  const id = target.getAttribute('data-id');
+  if (!action || !id) return;
+  const item = cachedApis.find(x => x.id === id);
+  if (!item) return;
+  if (action === 'copy'){
+    try { await navigator.clipboard.writeText(item.key); target.textContent = 'Copied!'; setTimeout(()=> target.textContent='Copy', 1200); } catch(_){ alert('Copy failed'); }
+  }
+  if (action === 'edit'){
+    apiModalTitle.textContent = 'Edit API';
+    apiModeInput.value = 'edit';
+    apiIdInput.value = id;
+    apiNameInput.value = item.name || '';
+    apiDescInput.value = item.description || '';
+    apiKeyInput.value = item.key || '';
+    apiModal.style.display = 'flex';
+  }
+  if (action === 'delete'){
+    if (confirm('Delete this API?')){
+      try { await deleteDoc(doc(db, 'apis', id)); } catch(err){ alert('Delete failed: ' + err.message); }
+    }
   }
 });

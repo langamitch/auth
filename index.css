@@ -1,11 +1,40 @@
 * {
   margin: 0; padding: 0; box-sizing: border-box;
 }
+/* Neue Montreal font faces (add actual font files to assets/fonts) */
+@font-face {
+  font-family: 'Neue Montreal';
+  src: local('Neue Montreal Regular'), local('NeueMontreal-Regular'),
+       url('assets/fonts/NeueMontreal-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: local('Neue Montreal Medium'), local('NeueMontreal-Medium'),
+       url('assets/fonts/NeueMontreal-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: local('Neue Montreal Bold'), local('NeueMontreal-Bold'),
+       url('assets/fonts/NeueMontreal-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
-  font-family: 'Geist', sans-serif;
+  font-family: 'Neue Montreal', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   background: #000;
   color: #fff;
 }
+
+/* Font rendering improvements */
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 /* Navbar */
 .navbar {
@@ -168,6 +197,32 @@ main { padding: 24px; max-width: 1100px; margin: 0 auto; width: 100%; }
   .hero { grid-template-columns: 1fr; padding: 36px 0 48px; }
   .hero-art { order: -1; height: 220px; }
   .hero-title { font-size: 40px; }
+}
+
+/* Embedded app */
+.embed-section { padding: 24px 0 48px; }
+.embed-title { font-size: 22px; margin-bottom: 12px; color: #cfcfcf; }
+.embed-frame { border: 1px solid #2b2b2b; border-radius: 12px; overflow: hidden; background: #0a0a0a; }
+.embed-frame iframe { width: 100%; height: 70vh; border: 0; background: #0a0a0a; }
+
+/* My APIs */
+.apis-section { padding: 32px 0 64px; }
+.apis-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.apis-actions { display: flex; gap: 10px; }
+.api-search { min-width: 220px; padding: 10px 12px; border-radius: 8px; border: 1px solid #2b2b2b; background:#0d0d0d; color:#fff; }
+.apis-empty { color: #9d9d9d; padding: 16px 0; }
+.apis-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.api-card { border: 1px solid #2b2b2b; background: #0d0d0d; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.api-card h3 { font-size: 18px; }
+.api-card p { color: #b6b6b6; font-size: 14px; }
+.api-row { display:flex; gap:8px; align-items:center; }
+.api-key { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; color:#dcdcdc; padding:6px 8px; background:#0a0a0a; border:1px solid #2b2b2b; border-radius:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.api-actions { display:flex; gap:8px; margin-top: 6px; }
+.btn-ghost { background: #151515; color: #fff; border:1px solid #2b2b2b; padding:8px 10px; border-radius:8px; cursor:pointer; }
+
+@media (max-width: 700px) {
+  .apis-header { flex-direction: column; align-items: stretch; }
+  .apis-actions { justify-content: space-between; }
 }
 
 

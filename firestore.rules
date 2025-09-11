@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isOwnerOfExisting() {
+      return isSignedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    function isOwnerOfRequest() {
+      return isSignedIn() && request.resource.data.uid == request.auth.uid;
+    }
+
+    // Users: each user can manage only their own user doc
+    match /users/{userId} {
+      allow create: if isOwner(userId)
+                    && request.resource.data.uid == userId
+                    && request.resource.data.keys().hasOnly(['uid','name','email','photoURL','createdAt','lastLoginAt']);
+
+      allow read, update, delete: if isOwner(userId);
+    }
+
+    // APIs: per-user API entries
+    match /apis/{apiId} {
+      allow create: if isOwnerOfRequest()
+                    && request.resource.data.keys().hasOnly(['uid','name','description','key','createdAt','updatedAt'])
+                    && request.resource.data.name is string
+                    && request.resource.data.key is string;
+
+      allow read, update, delete: if isOwnerOfExisting();
+    }
+  }
+}
+
+
