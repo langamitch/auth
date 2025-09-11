@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, onAuthStateChanged, signOut, 
   signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, updateDoc, serverTimestamp, collection, addDoc, query, where, orderBy, onSnapshot, deleteDoc } 
+import { getFirestore, doc, setDoc, updateDoc, serverTimestamp, collection, addDoc, query, where, onSnapshot, deleteDoc } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Firebase Config
@@ -298,18 +298,21 @@ function renderApis(items){
   }
   if (apisEmpty) apisEmpty.style.display = 'none';
   for (const it of filtered){
+    const masked = (it.key && it.key.length > 6) ? `${it.key.slice(0,3)}••••${it.key.slice(-3)}` : (it.key || '');
+    const publicId = it.publicId || '';
     const card = document.createElement('div');
     card.className = 'api-card';
     card.innerHTML = `
       <h3>${it.name || 'Untitled'}</h3>
       <p>${it.description || ''}</p>
       <div class="api-row">
-        <span class="api-key" title="${it.key}">${it.key}</span>
+        <span class="api-key" title="${it.key}">${masked}</span>
       </div>
       <div class="api-actions">
         <button class="btn-ghost" data-action="copy" data-id="${it.id}">Copy</button>
         <button class="btn-ghost" data-action="edit" data-id="${it.id}">Edit</button>
         <button class="btn-ghost" data-action="delete" data-id="${it.id}">Delete</button>
+        <button class="btn-ghost" data-action="use" data-id="${it.id}">Use</button>
       </div>
     `;
     apisList.appendChild(card);
@@ -326,7 +329,8 @@ function watchApis(user){
     return;
   }
   currentUserId = user.uid;
-  const q = query(collection(db, 'apis'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
+  // Order by server timestamp requires index sometimes; keep simple filter by uid
+  const q = query(collection(db, 'apis'), where('uid', '==', user.uid));
   unsubscribeApis = onSnapshot(q, (snap) => {
     cachedApis = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderApis(cachedApis);
@@ -372,8 +376,11 @@ apiForm?.addEventListener('submit', async (e) => {
       // Do not allow changing uid or createdAt on update
       await updateDoc(doc(db, 'apis', apiIdInput.value), baseData);
     } else {
+      // Generate a public reference id (non-secret) for embedding usage
+      const publicId = `pub_${Math.random().toString(36).slice(2,10)}${Date.now().toString(36)}`;
       await addDoc(collection(db, 'apis'), {
         uid: auth.currentUser.uid,
+        publicId,
         ...baseData,
         createdAt: serverTimestamp()
       });
@@ -409,5 +416,9 @@ apisList?.addEventListener('click', async (e) => {
     if (confirm('Delete this API?')){
       try { await deleteDoc(doc(db, 'apis', id)); } catch(err){ alert('Delete failed: ' + err.message); }
     }
+  }
+  if (action === 'use'){
+    const snippet = `<script src="${location.origin}/sdk.js" data-public-id="${item.publicId}"><\/script>`;
+    try { await navigator.clipboard.writeText(snippet); target.textContent = 'Snippet Copied!'; setTimeout(()=> target.textContent='Use', 1200); } catch(_){ alert('Copy failed'); }
   }
 });
