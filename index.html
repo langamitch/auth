@@ -70,6 +70,51 @@
       <div id="apis-list" class="apis-list" aria-live="polite"></div>
       <div id="apis-empty" class="apis-empty" style="display:none;">No APIs yet. Click "Add API" to create one.</div>
     </section>
+
+    <!-- Documentation -->
+    <section id="docs" class="docs-section">
+      <h2>Documentation</h2>
+      <p>Integrate Flow API Manager into any website with one script tag. Keep your real API keys secure by routing through your server.</p>
+
+      <h3 id="install">1) Install</h3>
+      <pre class="code"><code>&lt;script src="https://your-domain/sdk.js" data-public-id="pub_XXXX"&gt;&lt;/script&gt;</code></pre>
+      <p>Replace <code>pub_XXXX</code> with the public ID from your API card (Use button copies a snippet).</p>
+
+      <h3 id="request">2) Make a request</h3>
+      <pre class="code"><code>window.FlowAPI.request({
+  url: 'https://api.example.com/v1/data',
+  method: 'GET',
+  headers: { 'Accept': 'application/json' }
+}).then(console.log).catch(console.error);</code></pre>
+
+      <h3 id="server-proxy">3) Server proxy (required)</h3>
+      <p>Create a server endpoint (e.g., Firebase Cloud Function) that receives <code>X-Flow-Public-Id</code>, looks up the real key in Firestore, performs the upstream request server-side, and returns the response.</p>
+      <pre class="code"><code>// Pseudocode
+app.post('/proxy', async (req, res) =&gt; {
+  const publicId = req.get('X-Flow-Public-Id');
+  const { url, method, headers, body } = req.body;
+  const apiDoc = await db.collection('apis').where('publicId','==',publicId).limit(1).get();
+  if (apiDoc.empty) return res.status(404).send('Not found');
+  const { key } = apiDoc.docs[0].data();
+  const upstream = await fetch(url, { method, headers: { ...headers, Authorization: `Bearer ${key}` }, body: JSON.stringify(body) });
+  const text = await upstream.text();
+  res.status(upstream.status).type(upstream.headers.get('content-type')||'text/plain').send(text);
+});</code></pre>
+
+      <h3 id="security">4) Security</h3>
+      <ul>
+        <li>Your real key never ships to the browser. The SDK sends only the public ID.</li>
+        <li>Firestore rules restrict data to the owning user.</li>
+        <li>Rotate keys by updating the API doc; the public ID can remain constant.</li>
+      </ul>
+
+      <h3 id="troubleshooting">Troubleshooting</h3>
+      <ul>
+        <li>If your APIs don’t show, ensure you’re signed in and have added entries.</li>
+        <li>Verify Firestore rules are deployed and your project has read/write permission for your user.</li>
+        <li>Set your actual proxy URL in <code>sdk.js</code> (<code>DEFAULT_ENDPOINT</code>).</li>
+      </ul>
+    </section>
   </main>
 
   <!-- Loader -->

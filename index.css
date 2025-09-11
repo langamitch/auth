@@ -47,8 +47,7 @@ html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .nav-right { display: flex; align-items: center; gap: 10px;   background-color: rgb(39, 39, 39);
   border: 1px solid rgb(55, 55, 55); padding:20px;}
 .nav-right button { 
-      background-color: rgb(39, 39, 39);
-    border: 0.1rem solid rgb(55, 55, 55);
+
     
   margin-left: 10px; padding: 8px 12px;  border-radius: 5px; 
   cursor: pointer; background: #303030; color: #fff; font-weight: bold;
@@ -185,8 +184,8 @@ main { padding: 24px; max-width: 1100px; margin: 0 auto; width: 100%; }
 
 .hero-art {
   position: relative;
-  height: 360px;
-  border-radius: 20px;
+  height: 390px;
+  border-radius: 10px;
   background: radial-gradient(1200px 600px at 60% 20%, rgba(99,102,241,0.35), transparent 60%),
               radial-gradient(900px 600px at 30% 80%, rgba(16,185,129,0.35), transparent 60%),
               linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0));
@@ -212,7 +211,8 @@ main { padding: 24px; max-width: 1100px; margin: 0 auto; width: 100%; }
 .api-search { min-width: 220px; padding: 10px 12px; border-radius: 8px; border: 1px solid #2b2b2b; background:#0d0d0d; color:#fff; }
 .apis-empty { color: #9d9d9d; padding: 16px 0; }
 .apis-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-.api-card { border: 1px solid #2b2b2b; background: #0d0d0d; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.api-card {       background-color: rgb(39, 39, 39);
+  border: 0.1rem solid rgb(55, 55, 55); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
 .api-card h3 { font-size: 18px; }
 .api-card p { color: #b6b6b6; font-size: 14px; }
 .api-row { display:flex; gap:8px; align-items:center; }
