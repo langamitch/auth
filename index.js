@@ -3,6 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, onAuthStateChanged, signOut, 
   signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, updateDoc, serverTimestamp } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -17,6 +19,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 // Navbar & sidebar references
 const navLinks = document.getElementById("nav-links");
@@ -95,7 +98,7 @@ function updateNavbar(user) {
       profileDropdownEl = document.createElement('div');
       profileDropdownEl.className = 'profile-dropdown';
       profileDropdownEl.innerHTML = `
-        <div style="padding: 10px 0px; color:#aaa;font-weight: 700; font-size:16px;">Account</div>
+        <div style="padding: 30px 0px; color:#aaa;font-weight: 700; font-size:16px;">Account</div>
         <a href="#">Profile</a>
         <a href="#">Settings</a>
         <button id="dropdown-logout">Logout</button>
@@ -188,7 +191,10 @@ loginForm.addEventListener("submit", async (e) => {
   const password = document.getElementById("loginPassword").value;
 
   try {
-    await signInWithEmailAndPassword(auth, email, password);
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    try {
+      await updateDoc(doc(db, 'users', cred.user.uid), { lastLoginAt: serverTimestamp() });
+    } catch (_) { /* ignore if doc doesn't exist */ }
     loginModal.style.display = "none";
   } catch (error) {
     alert("Login failed: " + error.message);
@@ -209,6 +215,15 @@ signupForm.addEventListener("submit", async (e) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(userCredential.user, { displayName: name });
+    // Persist user profile in Firestore
+    await setDoc(doc(db, 'users', userCredential.user.uid), {
+      uid: userCredential.user.uid,
+      name,
+      email,
+      photoURL: userCredential.user.photoURL || null,
+      createdAt: serverTimestamp(),
+      lastLoginAt: serverTimestamp()
+    }, { merge: true });
     signupModal.style.display = "none";
   } catch (error) {
     alert("Signup failed: " + error.message);
@@ -238,3 +253,16 @@ function maybeHideLoader(){
     appLoadedResolvers = [];
   }
 }
+
+// Hero CTA wiring
+document.addEventListener('click', (e) => {
+  const target = e.target;
+  if (!(target instanceof HTMLElement)) return;
+  if (target.id === 'cta-get-started') {
+    // Prefer signup for new users
+    if (typeof signupModal !== 'undefined') signupModal.style.display = 'flex';
+  }
+  if (target.id === 'cta-sign-in') {
+    if (typeof loginModal !== 'undefined') loginModal.style.display = 'flex';
+  }
+});
