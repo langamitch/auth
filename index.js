@@ -100,6 +100,7 @@ function updateNavbar(user) {
     <li><a href="#">About</a></li>
     <li><a href="#">Privacy</a></li>
     <li><a href="#api-manager">API Manager</a></li>
+    <li><a href="#docs">Docs</a></li>
   `;
 
   if (user) {
@@ -158,7 +159,9 @@ function updateNavbar(user) {
       <li><a href="#">Home</a></li>
       <li><a href="#">About</a></li>
       <li><a href="#">Privacy</a></li>
-
+      <li><a href="#api-manager">API Manager</a></li>
+      <li><a href="#docs">Docs</a></li>
+      <li><a href="#" id="logout-mobile">Logout</a></li>
     `;
     document.getElementById("logout-mobile").onclick = () => {
       signOut(auth);
@@ -184,9 +187,10 @@ function updateNavbar(user) {
       <li><a href="#">Home</a></li>
       <li><a href="#">About</a></li>
       <li><a href="#">Privacy</a></li>
-      <div class="sidebottom">
+      <li><a href="#api-manager">API Manager</a></li>
+      <li><a href="#docs">Docs</a></li>
       <li><a href="#" id="loginSidebar">Login</a></li>
-      <li><a href="#" id="signupSidebar">Signup</a></li></
+      <li><a href="#" id="signupSidebar">Signup</a></li>
     `;
     document.getElementById("loginSidebar").onclick = () => {
       loginModal.style.display = "flex";
