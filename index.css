@@ -214,7 +214,7 @@ main { padding: 24px; max-width: 1100px; margin: 0 auto; width: 100%; }
 .api-card {       background-color: rgb(39, 39, 39);
   border: 0.1rem solid rgb(55, 55, 55); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
 .api-card h3 { font-size: 18px; }
-.api-card p { color: #b6b6b6; font-size: 14px; }
+.api-card p { color: #b6b6b6; font-size: 16px; }
 .api-row { display:flex; gap:8px; align-items:center; }
 .api-key { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; color:#dcdcdc; padding:6px 8px; background:#0a0a0a; border:1px solid #2b2b2b; border-radius:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .api-actions { display:flex; gap:8px; margin-top: 6px; }
