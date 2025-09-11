@@ -95,7 +95,7 @@ function updateNavbar(user) {
       profileDropdownEl = document.createElement('div');
       profileDropdownEl.className = 'profile-dropdown';
       profileDropdownEl.innerHTML = `
-        <div style="padding: 6px 10px; color:#aaa; font-size:12px;">Account</div>
+        <div style="padding: 10px 0px; color:#aaa;font-weight: 700; font-size:16px;">Account</div>
         <a href="#">Profile</a>
         <a href="#">Settings</a>
         <button id="dropdown-logout">Logout</button>

@@ -15,7 +15,8 @@ body {
 .nav-left .logo { font-size: 20px; font-weight: bold; }
 .nav-mid ul { list-style: none; display: flex; gap: 20px; }
 .nav-mid a { color: white; text-decoration: none; font-size: 16px; }
-.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-right { display: flex; align-items: center; gap: 10px;   background-color: rgb(39, 39, 39);
+  border: 1px solid rgb(55, 55, 55); padding:20px;}
 .nav-right button { 
       background-color: rgb(39, 39, 39);
     border: 0.1rem solid rgb(55, 55, 55);
@@ -76,8 +77,8 @@ cubic-bezier(0.175, 0.885, 0.32, 1.275);
   right: 20px;
   background: #e4e4e4;
   border: 1px solid #333;
-  border-radius: 10px;
-  min-width: 200px;
+  border-radius: 1px;
+  min-width: 180px;
   padding: 10px;
   display: none;
   z-index: 1100;
@@ -91,11 +92,12 @@ cubic-bezier(0.175, 0.885, 0.32, 1.275);
   background: transparent;
   color: #181818a8;
   border: none;
-  padding: 10px 12px;
+  padding: 7px 0px 9px;
   border-radius: 6px;
   cursor: pointer;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 16px;
+  font-weight:500;
 }
 .profile-dropdown a:hover,
 .profile-dropdown button:hover { background: #1b1b1b; }
