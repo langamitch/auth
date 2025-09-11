@@ -361,19 +361,22 @@ window.addEventListener('click', (e) => { if (e.target === apiModal) apiModal.st
 apiForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!auth.currentUser){ alert('Please sign in first.'); return; }
-  const payload = {
-    uid: auth.currentUser.uid,
+  const baseData = {
     name: apiNameInput.value.trim(),
     description: apiDescInput.value.trim(),
     key: apiKeyInput.value.trim(),
-    createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   };
   try {
     if (apiModeInput.value === 'edit' && apiIdInput.value){
-      await updateDoc(doc(db, 'apis', apiIdInput.value), payload);
+      // Do not allow changing uid or createdAt on update
+      await updateDoc(doc(db, 'apis', apiIdInput.value), baseData);
     } else {
-      await addDoc(collection(db, 'apis'), payload);
+      await addDoc(collection(db, 'apis'), {
+        uid: auth.currentUser.uid,
+        ...baseData,
+        createdAt: serverTimestamp()
+      });
     }
     apiModal.style.display = 'none';
   } catch (err){
