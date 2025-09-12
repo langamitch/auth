@@ -309,7 +309,7 @@ function renderApis(items){
     card.innerHTML = `
      <div class="card-top">
       <div class="card-img">
-  <img src="https://images.unsplash.com/photo-1632516643720-e7f5d7d6ecc9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjB8fGdyYWRpZW50JTIwYmFja2dyb3VuZHxlbnwwfHwwfHx8MA%3D%3D" />
+  <img src="" />
   <h3>${it.name || 'Untitled'}</h3>
 </div>
 

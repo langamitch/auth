@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' https://www.gstatic.com https://www.googleapis.com; connect-src 'self' https://firestore.googleapis.com https://www.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com; frame-src 'self' https://v0-api-key-manager-eight.vercel.app; child-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
   <title>Auth Website</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +15,7 @@
     
   <nav class="navbar">
     <div class="nav-left">
-      <h2 class="logo">Flow</h2>
+      <h2 class="logo">FlowAPI</h2>
     </div>
     <div class="nav-mid" id="nav-mid">
       <ul id="nav-links">
@@ -43,6 +44,13 @@
     <ul id="sidebar-links"></ul>
   </div>
 
+  <section class="top-nav">
+
+    <div class="item active"><p>Overview</p></div>
+    <div class="item"><p>API Manager</p></div>
+    <div class="item"><p>Docs</p></div>
+    <div class="item"><p>Overview</p></div>
+  </section>
   <!-- Body -->
   <main><!-- Body 
     <section class="hero" id="hero">
@@ -57,21 +65,22 @@
       <div class="hero-art"></div>
     </section> -->
 
-
     <!-- Native My APIs Manager -->
+     
     <section id="my-apis" class="apis-section">
       <div class="apis-header">
-        <h2>My APIs</h2>
+        
         <div class="apis-actions">
           <input id="api-search" class="api-search" type="search" placeholder="Search APIs" aria-label="Search APIs">
-          <button id="api-add-btn" class="btn btn-primary">Add API</button>
+          <button id="api-filter" class="btn btn-second"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff"><path d="M400-240v-80h160v80H400ZM240-440v-80h480v80H240ZM120-640v-80h720v80H120Z"/></svg></button>
+          <button id="api-add-btn" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg></button>
         </div>
       </div>
       <div id="apis-list" class="apis-list" aria-live="polite"></div>
       <div id="apis-empty" class="apis-empty" style="display:none;">No APIs yet. Click "Add API" to create one.</div>
     </section>
 
-    <!-- Documentation -->
+    <!-- Documentation 
     <section id="docs" class="docs-section">
       <h2>Documentation</h2>
       <p>Integrate Flow API Manager into any website with one script tag. Keep your real API keys secure by routing through your server.</p>
@@ -114,7 +123,7 @@ app.post('/proxy', async (req, res) =&gt; {
         <li>Verify Firestore rules are deployed and your project has read/write permission for your user.</li>
         <li>Set your actual proxy URL in <code>sdk.js</code> (<code>DEFAULT_ENDPOINT</code>).</li>
       </ul>
-    </section>
+    </section>-->
   </main>
 
   <!-- Loader -->

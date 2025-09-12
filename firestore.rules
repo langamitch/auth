@@ -32,9 +32,19 @@ service cloud.firestore {
       allow create: if isOwnerOfRequest()
                     && request.resource.data.keys().hasOnly(['uid','name','description','key','publicId','createdAt','updatedAt'])
                     && request.resource.data.name is string
-                    && request.resource.data.key is string;
+                    && request.resource.data.key is string
+                    && (request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 120)
+                    && (request.resource.data.key.size() > 6 && request.resource.data.key.size() <= 4096)
+                    && request.resource.data.publicId.matches(/^pub_[a-z0-9]{6,20}[a-z0-9]+$/);
 
-      allow read, update, delete: if isOwnerOfExisting();
+      allow update: if isOwnerOfExisting()
+                    && !(request.resource.data.diff(resource.data).changedKeys().hasAny(['uid','createdAt','publicId']))
+                    && request.resource.data.name is string
+                    && request.resource.data.key is string
+                    && (request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 120)
+                    && (request.resource.data.key.size() > 6 && request.resource.data.key.size() <= 4096);
+
+      allow read, delete: if isOwnerOfExisting();
     }
   }
 }
