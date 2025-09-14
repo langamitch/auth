@@ -365,6 +365,26 @@ font-size: 32px;
   background: #eee;
 }
 
+/* Textarea styling to match inputs */
+.modal-content textarea {
+  width: 100%;
+  padding: 16px 14px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 6px;
+  background: #f5f5f5;
+  font-size: 16px;
+  font-weight:500;
+  outline: none;
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+}
+
+.modal-content textarea:focus {
+  background: #eee;
+}
+
 /* Button */ 
 .modal-content button {
   width: 100%;
